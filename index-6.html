@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#2563eb"><link rel="manifest" href="manifest.json">
+<title>برنامه درسی دهم تجربی</title>
+<style>
+body{font-family:system-ui,sans-serif;margin:0;background:#f4f7fb;color:#172033}
+header{background:#2563eb;color:white;padding:20px;text-align:center}
+main{max-width:850px;margin:auto;padding:16px}
+.card{background:white;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 3px 14px #0001}
+h2{margin-top:0}.row{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #eee}
+input[type=checkbox]{width:22px;height:22px}.time{font-weight:700;min-width:110px}.subject{flex:1}
+button{border:0;border-radius:10px;padding:10px 14px;background:#2563eb;color:white;font-size:15px}
+.small{color:#667085;font-size:14px}.progress{height:10px;background:#e5e7eb;border-radius:10px;overflow:hidden}.bar{height:100%;background:#2563eb;width:0}
+nav{display:flex;gap:7px;overflow:auto;margin:10px 0}nav button{white-space:nowrap;background:#dbeafe;color:#1d4ed8}nav button.active{background:#2563eb;color:white}
+</style>
+</head>
+<body>
+<header><h1>📚 برنامه درسی دهم تجربی</h1><div>هدف: معدل بالا + ساختن پایه قوی برای کنکور</div></header>
+<main>
+<div class="card"><h2>پیشرفت امروز</h2><div class="progress"><div class="bar" id="bar"></div></div><p class="small" id="pct"></p></div>
+<nav id="days"></nav><div id="content"></div>
+<div class="card"><h2>🧠 چرخه مطالعه</h2><p>یادگیری عمیق → تمرین تشریحی → تست → تحلیل تست → مرور</p>
+<p class="small">زیست و شیمی: کتاب درسی محور اصلی باشد. تست‌ها را تحلیل کن، نه فقط شمارش.</p></div>
+</main>
+<script>
+const plan={
+"شنبه":[["14:30–15:30","ناهار + استراحت"],["15:30–17:00","🧬 زیست"],["17:00–17:30","استراحت"],["17:30–19:00","🧮 ریاضی"],["19:00–19:45","شام + استراحت"],["19:45–21:00","📚 ادبیات/عربی/دینی/زبان"],["21:00–21:30","استراحت"],["21:30–22:30","📝 تست و مرور"] ],
+"یکشنبه":[["14:30–15:30","ناهار + استراحت"],["15:30–17:00","🧪 شیمی"],["17:00–17:30","استراحت"],["17:30–19:00","⚡ فیزیک"],["19:00–19:45","شام + استراحت"],["19:45–21:00","📚 دروس عمومی"],["21:00–21:30","استراحت"],["21:30–22:30","📝 تست و تحلیل"] ],
+"دوشنبه":[["14:30–15:30","ناهار + استراحت"],["15:30–17:00","🧬 زیست"],["17:00–17:30","استراحت"],["17:30–19:00","🧮 ریاضی"],["19:00–19:45","شام + استراحت"],["19:45–21:00","📚 دروس عمومی"],["21:00–21:30","استراحت"],["21:30–22:30","📝 تست و مرور"] ],
+"سه‌شنبه":[["14:30–15:30","ناهار + استراحت"],["15:30–17:00","🧪 شیمی"],["17:00–17:30","استراحت"],["17:30–19:00","⚡ فیزیک"],["19:00–19:45","شام + استراحت"],["19:45–21:00","📚 دروس عمومی"],["21:00–21:30","استراحت"],["21:30–22:30","📝 تست و تحلیل"] ],
+"چهارشنبه":[["14:30–15:30","ناهار + استراحت"],["15:30–17:00","🧬 زیست"],["17:00–17:30","استراحت"],["17:30–19:00","🧮 ریاضی / ⚡ فیزیک"],["19:00–19:45","شام + استراحت"],["19:45–21:00","📚 دروس عمومی"],["21:00–21:30","استراحت"],["21:30–22:30","📝 تست ترکیبی"] ],
+"پنجشنبه":[["09:00–11:00","🧬 زیست"],["11:00–11:30","استراحت"],["11:30–13:00","🧪 شیمی"],["13:00–15:00","ناهار + استراحت"],["15:00–16:30","🧮 ریاضی"],["16:30–17:00","استراحت"],["17:00–18:30","⚡ فیزیک"],["19:30–20:30","📚 عمومی"],["20:30–22:00","📝 تست جامع + تحلیل"] ],
+"جمعه":[["09:00–11:00","📝 آزمون مباحث هفته"],["11:00–12:00","استراحت"],["12:00–13:30","🔎 تحلیل آزمون"],["13:30–16:00","ناهار + استراحت"],["16:00–17:30","🛠️ رفع اشکال"],["18:00–19:00","🔁 مرور خلاصه‌ها"],["19:00–20:00","برنامه‌ریزی هفته بعد"],["20:00 به بعد","استراحت و خواب کافی"]]
+};
+let selected="شنبه"; const days=document.getElementById("days");
+Object.keys(plan).forEach(d=>{let b=document.createElement("button");b.textContent=d;b.onclick=()=>{selected=d;render()};days.appendChild(b)});
+function key(d,i){return "pwa10-"+d+"-"+i}
+function render(){
+[...days.children].forEach((b,i)=>b.classList.toggle("active",Object.keys(plan)[i]===selected));
+let c=document.getElementById("content");c.innerHTML=`<div class="card"><h2>${selected}</h2>${plan[selected].map((x,i)=>`
+<div class="row"><input type="checkbox" ${localStorage.getItem(key(selected,i))==="1"?"checked":""} onchange="save('${selected}',${i},this.checked)">
+<div class="time">${x[0]}</div><div class="subject">${x[1]}</div></div>`).join("")}</div>`;
+update();
+}
+function save(d,i,v){localStorage.setItem(key(d,i),v?"1":"0");update()}
+function update(){let all=0,done=0;Object.entries(plan).forEach(([d,a])=>a.forEach((_,i)=>{all++;if(localStorage.getItem(key(d,i))==="1")done++}));let p=Math.round(done/all*100);document.getElementById("bar").style.width=p+"%";document.getElementById("pct").textContent=`${done} از ${all} فعالیت انجام شده — ${p}%`}
+render();
+if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+</script>
+</body></html>
